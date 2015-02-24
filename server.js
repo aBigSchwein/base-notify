@@ -3,7 +3,7 @@ var server = require('http').Server(app);
 var io = require('socket.io')(server);
 var https = require('follow-redirects').https;
 var btoa = require('btoa');
-var port = 3000;
+var port = process.env.PORT || 3000;
 
 app.get('/', function (req, res) 
 {
@@ -138,7 +138,7 @@ io.on('connection', function (socket)
 				res.on('end', function()
 				{
 					info = JSON.parse(info);
-					//console.log("Info: ",info[0]);
+					
 					var id = info[0].creator.id;
 					var name = info[0].creator.name;
 					var img = info[0].creator.avatar_url;
