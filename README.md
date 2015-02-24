@@ -6,8 +6,8 @@ Essentially it pings Basecamp API, and notifies you with webkit notifications on
 
 ### App Flow
 This will probably change with each version.
->Current flow with v1.0.0:
-	* User finds projectID from basecamp.com when authenticated from URL its [https://basecamp.com/XXXXXXXX]https://launchpad.37signals.com/basecamp
+*Current flow with v1.0.0:*
+	* User finds projectID from basecamp.com when authenticated from URL its [https://basecamp.com/XXXXXXXX](https://launchpad.37signals.com/basecamp)
 	* Checks for Saved credentials in localstorage
 	* Valid Credentials check succeeds then app gets your userID and the projects associated to you.
 	* Some ghetto sorting and boom you get the latest project update
@@ -17,10 +17,10 @@ This will probably change with each version.
 	* Loops every 6000ms and takes ~2000ms to run. 
 
 ###Things to work on
->WIP:
+*WIP:*
 	* Get ProjectID based on username/password
 	* User actual Basecamp oAuth
->Backlog:
+*Backlog:*
 	* Styles for notification
 	* Page layout/style updates
 	* Notification excerpt limiting of text length 
