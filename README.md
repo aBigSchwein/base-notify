@@ -4,6 +4,9 @@ base-notify
 This app is still very much in developement.
 Essentially it pings Basecamp API, and notifies you with webkit notifications on the newest updates
 
+###Live Demo
+You can view a sample here, it is still pretty ghetto: [https://basenotify.herokuapp.com/](https://basenotify.herokuapp.com/)
+
 ###App Flow
 This will probably change with each version.
 
