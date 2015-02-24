@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Base-Notify</title>
+		<link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css" rel="stylesheet" />
+		<link rel="icon" href="https://d3dma7a8zw52bz.cloudfront.net/assets/logos/ms-tile-icon-377afa1e780588c7b44b247e487d06cc.png">
+	</head>
+	<body>
+		<div class="container-fluid">
+			<div class="row">
+				<div class="col-xs-12 col-sm-10 col-sm-offset-1">
+					<div class="well">
+						<h1 id="brand"></h1>
+						<small id="version"></small>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-xs-12 col-sm-4 col-sm-offset-4">
+					<div class="well">
+						<div id="loading" class="text-center"><h1>Need Credentials</h1></div>
+						<ul id="list" class="list-group"></ul>
+					</div>
+				</div>
+			</div>
+			<div id="credModal" class="modal fade">
+				<div class="modal-dialog" style="width:200px !important;">
+					<div class="modal-content">
+						<div class="modal-header" style="text-align: center !important;">
+							<h4 class="modal-title">Basecamp Credentials</h4>
+						</div>
+						<div class="modal-body">
+							<span class="lead">ProjectID:</span><br/>
+							<input type="text" id="pID" placeholder="ProjectID"/><br/>
+							<span class="lead">Username:</span><br/>
+							<input type="text" id="unID" placeholder="Email"/><br/>
+							<span class="lead">Password:</span><br/>
+							<input type="password" id="pwdID" placeholder="Password"/><br/>
+						</div>
+						<div class="modal-footer" style="text-align: center !important;">
+							<a href="#" id="saveCreds" class="btn btn-primary">Save Credentials</a>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<script type="application/javascript" src="//code.jquery.com/jquery-latest.js"></script>
+		<script type="application/javascript" src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+		<script type="application/javascript" src="//cdn.socket.io/socket.io-1.2.0.js"></script>
+		<script>
+			$("#saveCreds").on('click',function(){
+				var projectID = $("#pID").val();
+				var username = $("#unID").val();
+				var password = $("#pwdID").val();
+				save_creds(projectID,username,password);
+				startApp();
+			});
+			var socket = io();
+			socket.on('welcome', function (data)
+			{
+				if(data)
+				{
+					$('#brand').text("Welcome");
+					$("#version").text(data.version);
+					if(creds_exist())
+					{
+						startApp();
+					}
+					else
+						$("#credModal").modal('show');	
+				}
+				else
+				{
+					
+					$("#loading").html("<h3>Server Down...</h3>").show();
+				}
+			});
+			socket.on('update',function(data)
+			{	
+				if(data)
+				{
+					var project = data.project;
+					var li = "<li id='"+project.id+"' class='list-group-item'><div class='text-center'><img src='"+project.img+"' class='img-circle'/><br/><p class='lead'>"+project.title+"</p><p class='exerpt'>"+project.exerpt+"</p><a href='"+project.url+"' class='btn btn-sm btn-primary' target='_blank'>Comment</a><br/></div></li>";
+					$("#list").prepend(li);
+					notifyMe(project);
+					loop(project);
+				}
+				else
+				{
+					alert("Your Login credentials are invalid");
+				}
+			});
+			socket.on('not_update',function(data)
+			{
+				if(data)
+				{
+					var project = data.project;
+					loop(project);
+				}
+				else
+				{
+					alert("Your Login credentials are invalid");
+				}
+			});
+			function creds_exist()
+			{
+				var valid = false;
+				if((localStorage.getItem("projectID") && localStorage.getItem("projectID") != "") && (localStorage.getItem("username")  && localStorage.getItem("username") != "") && (localStorage.getItem("password") && localStorage.getItem("password") != ""))
+					valid = true;
+					
+				console.log("Credentials Valid: "+valid);
+				return valid;
+			}
+			function save_creds(projectID,username,password)
+			{
+				localStorage.setItem("projectID", projectID);
+				localStorage.setItem("username", username);
+				localStorage.setItem("password", password);
+			}
+			function startApp()
+			{
+				$("#loading").html("<h1>Loading...</h1>").show();
+				var projectID = localStorage.getItem("projectID");
+				var username = localStorage.getItem("username");
+				var password = localStorage.getItem("password");
+				socket.emit('refresh',{url: "", projectID: projectID, username: username, password: password});
+			}
+			function loop(project)
+			{
+				$("#loading").html("<h3>"+project.message+"</h3>").show();
+				setTimeout(function(){
+					if(creds_exist())
+					{
+						var projectID = localStorage.getItem("projectID");
+						var username = localStorage.getItem("username");
+						var password = localStorage.getItem("password");
+						socket.emit('refresh',{url: project.url, projectID: projectID, username: username, password: password});
+					}
+					else
+					{
+						$("#loading").html("<h1>Need Credentials</h1>").show();
+						$("#credModal").modal('show');
+						alert("Your credentials are invalid please re-auth!");
+					}
+				}, 6000);
+			}
+			function notifyMe(project) 
+			{
+				if (!Notification) 
+				{
+					alert("Sorry, but your Browser sucks and is not compatiple...")
+					window.location = "http://browsehappy.com/";
+					return;
+				}
+				
+				if (Notification.permission !== "granted")
+					Notification.requestPermission();
+				
+				var notification = new Notification(project.title, {
+					icon: project.img,
+					body: project.exerpt,
+				});
+				
+				notification.onclick = function () {
+					window.open(project.url);
+				}
+			}
+		</script>
+	</body>
+</html>

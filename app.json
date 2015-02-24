@@ -1,0 +1,7 @@
+{
+  "name": "base-notify",
+  "description": "Pings Basecamp API, and notifies you with webkit notifications on the newest updates",
+  "repository": "https://github.com/aBigSchwein/base-notify",
+  "logo": "https://d3dma7a8zw52bz.cloudfront.net/assets/logos/ms-tile-icon-377afa1e780588c7b44b247e487d06cc.png",
+  "keywords": ["basecamp", "notify", "base-notify"]
+}
